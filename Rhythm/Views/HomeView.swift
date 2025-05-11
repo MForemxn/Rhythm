@@ -189,6 +189,8 @@ struct DashboardStatCard: View {
     let icon: String
     let color: Color
     
+    @GestureState private var isPressed = false
+    
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: icon)
@@ -206,6 +208,14 @@ struct DashboardStatCard: View {
         .background(Color.white)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
+        .scaleEffect(isPressed ? 0.97 : 1)
+        .animation(.easeInOut(duration: 0.1), value: isPressed)
+        .gesture(
+            LongPressGesture(minimumDuration: 0.01)
+                .updating($isPressed) { currentState, gestureState, _ in
+                    gestureState = currentState
+                }
+        )
     }
 }
 

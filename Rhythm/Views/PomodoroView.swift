@@ -40,6 +40,10 @@ struct PomodoroView: View {
                         .foregroundColor(.secondary)
                 }
             }
+            
+            Text("\(Int(viewModel.progress * 100))% complete")
+                .font(.caption)
+                .foregroundColor(.gray)
 
             TimerControlsView(
                 isTimerActive: viewModel.isTimerActive,
