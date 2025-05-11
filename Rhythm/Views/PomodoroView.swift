@@ -25,7 +25,12 @@ struct PomodoroView: View {
 
                 Circle()
                     .trim(from: 0, to: viewModel.progress)
-                    .stroke(Color(hex: "#7B61FF"), style: StrokeStyle(lineWidth: 20, lineCap: .round))
+                    .stroke(
+                        viewModel.currentSession.type == .focus ? Color.purple :
+                        viewModel.currentSession.type == .shortBreak ? Color.green : Color.blue,
+                        style: StrokeStyle(lineWidth: 20, lineCap: .round)
+                            )
+//                    .stroke(Color(hex: "#7B61FF"), style: StrokeStyle(lineWidth: 20, lineCap: .round))
                     .frame(width: 250, height: 250)
                     .rotationEffect(.degrees(-90))
                     .animation(.linear, value: viewModel.progress)
@@ -42,7 +47,7 @@ struct PomodoroView: View {
             }
             
             Text("\(Int(viewModel.progress * 100))% complete")
-                .font(.caption)
+                .font(.headline)
                 .foregroundColor(.gray)
 
             TimerControlsView(
