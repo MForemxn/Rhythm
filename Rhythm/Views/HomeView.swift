@@ -15,7 +15,10 @@ struct HomeView: View {
     @Environment(\.dismiss) var dismiss
     
     @State private var showingTaskPopup = false
-    @State private var taskInput = ""
+    @State private var taskDescription = ""
+    @State private var estimatedMinutes: Int = 60
+    @State private var dueDate: Date = Date()
+
     
     var body: some View {
         NavigationView {
@@ -187,8 +190,9 @@ struct HomeView: View {
             VStack(spacing: 16) {
                 Text("New Task")
                     .font(.headline)
+                    .padding(.top, -40)
                 
-                TextField("Enter task description", text: $taskInput)
+                TextField("Enter task description", text: $taskDescription)
                     .padding()
                     .background(Color(.systemGray6))
                     .cornerRadius(12)
@@ -198,10 +202,47 @@ struct HomeView: View {
                     )
                     .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                     .padding(.horizontal)
+                
+                Spacer().frame(height: 15)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Estimated Time")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal)
+
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 12) {
+                        ForEach([30, 60, 90, 120, 180, 240], id: \.self) { minutes in
+                            Button(action: {
+                                estimatedMinutes = minutes
+                            }) {
+                                Text(
+                                    minutes >= 60 ?
+                                    "\(minutes / 60)h" + (minutes % 60 == 0 ? "" : " \(minutes % 60)m") :
+                                    "\(minutes)m"
+                                )
+                                .padding(10)
+                                .frame(maxWidth: .infinity)
+                                .background(estimatedMinutes == minutes ? Color.blue.opacity(0.2) : Color.gray.opacity(0.1))
+                                .foregroundColor(.primary)
+                                .cornerRadius(10)
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+
+                Spacer().frame(height: 15)
+
+                DatePicker("Due Date", selection: $dueDate, displayedComponents: [.date])
+                    .datePickerStyle(.compact)
+                    .padding(.horizontal)
+                
+                Spacer().frame(height: 12)
 
                 HStack {
                     Button("Cancel") {
-                        taskInput = ""
+                        taskDescription = ""
                         showingTaskPopup = false
                     }
                     .foregroundColor(.red)
@@ -210,16 +251,16 @@ struct HomeView: View {
 
                     Button("Add") {
                         // just a placeholder for now
-                        print("Task would be saved: \(taskInput)")
-                        taskInput = ""
+                        print("Task would be saved: \(taskDescription)")
+                        taskDescription = ""
                         showingTaskPopup = false
                     }
-                    .disabled(taskInput.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .disabled(taskDescription.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
                 .padding(.horizontal)
             }
             .padding()
-            .presentationDetents([.height(220)])
+            .presentationDetents([.height(500)])
         }
 
     }
