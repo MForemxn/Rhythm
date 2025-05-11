@@ -14,6 +14,9 @@ struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @Environment(\.dismiss) var dismiss
     
+    @State private var showingTaskPopup = false
+    @State private var taskInput = ""
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -101,44 +104,44 @@ struct HomeView: View {
                         .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
                         .padding(.horizontal)
                         
-                        // TEMPORARY SECTION - Chloe's Timer Features for Testing
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Timer Features Testing")
-                                .font(.headline)
-                                .foregroundColor(.orange)
-                            
-                            NavigationLink(destination: PomodoroView()) {
-                                HStack {
-                                    Image(systemName: "timer")
-                                        .foregroundColor(.white)
-                                    Text("Open Pomodoro Timer")
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.white)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.orange)
-                                .cornerRadius(12)
-                            }
-                            
-                            NavigationLink(destination: SettingsView()) {
-                                HStack {
-                                    Image(systemName: "gear")
-                                        .foregroundColor(.white)
-                                    Text("Timer Settings")
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.white)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.blue)
-                                .cornerRadius(12)
-                            }
-                            
-                            Text("Note: This section is temporary for testing")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
+//                        // TEMPORARY SECTION - Chloe's Timer Features for Testing
+//                        VStack(alignment: .leading, spacing: 12) {
+//                            Text("Timer Features Testing")
+//                                .font(.headline)
+//                                .foregroundColor(.orange)
+//                            
+//                            NavigationLink(destination: PomodoroView()) {
+//                                HStack {
+//                                    Image(systemName: "timer")
+//                                        .foregroundColor(.white)
+//                                    Text("Open Pomodoro Timer")
+//                                        .fontWeight(.semibold)
+//                                        .foregroundColor(.white)
+//                                }
+//                                .frame(maxWidth: .infinity)
+//                                .padding()
+//                                .background(Color.orange)
+//                                .cornerRadius(12)
+//                            }
+//                            
+//                            NavigationLink(destination: SettingsView()) {
+//                                HStack {
+//                                    Image(systemName: "gear")
+//                                        .foregroundColor(.white)
+//                                    Text("Timer Settings")
+//                                        .fontWeight(.semibold)
+//                                        .foregroundColor(.white)
+//                                }
+//                                .frame(maxWidth: .infinity)
+//                                .padding()
+//                                .background(Color.blue)
+//                                .cornerRadius(12)
+//                            }
+//                            
+//                            Text("Note: This section is temporary for testing")
+//                                .font(.caption)
+//                                .foregroundColor(.gray)
+//                        }
                         .padding()
                         .background(Color.white)
                         .cornerRadius(16)
@@ -150,7 +153,7 @@ struct HomeView: View {
                         HStack {
                             Spacer()
                             Button(action: {
-                                // TODO: Present add task view
+                                withAnimation { showingTaskPopup = true }
                             }) {
                                 HStack {
                                     Image(systemName: "plus")
@@ -180,6 +183,45 @@ struct HomeView: View {
                 viewModel.loadUserData()
             }
         }
+        .sheet(isPresented: $showingTaskPopup) {
+            VStack(spacing: 16) {
+                Text("New Task")
+                    .font(.headline)
+                
+                TextField("Enter task description", text: $taskInput)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                    )
+                    .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                    .padding(.horizontal)
+
+                HStack {
+                    Button("Cancel") {
+                        taskInput = ""
+                        showingTaskPopup = false
+                    }
+                    .foregroundColor(.red)
+
+                    Spacer()
+
+                    Button("Add") {
+                        // just a placeholder for now
+                        print("Task would be saved: \(taskInput)")
+                        taskInput = ""
+                        showingTaskPopup = false
+                    }
+                    .disabled(taskInput.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+                .padding(.horizontal)
+            }
+            .padding()
+            .presentationDetents([.height(220)])
+        }
+
     }
 }
 
