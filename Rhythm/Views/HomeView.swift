@@ -184,6 +184,7 @@ struct HomeView: View {
             }
             .onAppear {
                 viewModel.loadUserData()
+                viewModel.loadLocalTasks()
             }
         }
         .sheet(isPresented: $showingTaskPopup) {
@@ -250,8 +251,16 @@ struct HomeView: View {
                     Spacer()
 
                     Button("Add") {
-                        // just a placeholder for now
-                        print("Task would be saved: \(taskDescription)")
+                        let newTask = TaskModel(
+                            title: taskDescription,
+                            dueDate: dueDate,
+                            estimatedMinutes: estimatedMinutes
+                        )
+
+                        viewModel.tasks.append(newTask)
+                        viewModel.saveTasks()
+                        viewModel.updateStatsAndUpcomingList()
+
                         taskDescription = ""
                         showingTaskPopup = false
                     }
@@ -321,6 +330,11 @@ class HomeViewModel: ObservableObject {
     @Published var upcomingTasks: Int = 0
     @Published var totalStudyTime: Int = 0
     @Published var upcomingTaskList: [DashboardTask] = []
+    
+    // for local storage
+    @Published var tasks: [TaskModel] = []
+    private let tasksKey = "storedTasks"
+
     
     private let db = Firestore.firestore()
     
@@ -444,6 +458,42 @@ class HomeViewModel: ObservableObject {
             print("Error signing out: \(error.localizedDescription)")
         }
     }
+    
+    // Save tasks to UserDefaults
+    func saveTasks() {
+        do {
+            let encoded = try JSONEncoder().encode(tasks)
+            UserDefaults.standard.set(encoded, forKey: tasksKey)
+        } catch {
+            print("Failed to save tasks: \(error.localizedDescription)")
+        }
+    }
+
+    // Load tasks from UserDefaults
+    func loadLocalTasks() {
+        if let data = UserDefaults.standard.data(forKey: tasksKey) {
+            do {
+                let decoded = try JSONDecoder().decode([TaskModel].self, from: data)
+                tasks = decoded
+                updateStatsAndUpcomingList()
+            } catch {
+                print("Failed to load tasks: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func updateStatsAndUpcomingList() {
+        totalTasks = tasks.count
+        completedTasks = tasks.filter { $0.isCompleted }.count
+        let upcoming = tasks.filter { !$0.isCompleted }
+        upcomingTasks = upcoming.count
+
+        upcomingTaskList = upcoming.sorted(by: { $0.dueDate < $1.dueDate }).map {
+            DashboardTask(title: $0.title, completed: $0.isCompleted, dueDate: $0.dueDate)
+        }
+    }
+
+
 }
 
 #Preview {
