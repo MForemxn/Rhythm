@@ -23,13 +23,12 @@
 **Responsibility:** Core screens and user interface
 
 **Tasks:**
-- [ ] Build `HomeView` with quick overview of tasks and timer
-- [ ] Create `TaskListView` with list of tasks from `TaskViewModel`
-- [ ] Implement `TaskDetailView` (add/edit tasks)
-- [ ] Build `PomodoroView` to show active timer with controls
-- [ ] Add `SettingsView` with options for notifications, theme
-- [ ] Use `@State`, `@ObservedObject`, and `@Binding` properly
-- [ ] Make views responsive to session state and Firebase user
+- [X] Build `HomeView` with quick overview of tasks and timer
+- [X] Create `TaskListView` with list of tasks from `TaskViewModel`
+- [X] Implement ability to add tasks
+- [X] Build `PomodoroView` to show active timer with controls (added UI elements and fixes, work was done by Mason/Chloe)
+- [X] Use `@State`, `@ObservedObject`, and `@Binding` properly
+- [X] Make views responsive and save
 
 ---
 
