@@ -13,18 +13,17 @@ import Foundation
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @Environment(\.dismiss) var dismiss
-    
+
     @State private var showingTaskPopup = false
     @State private var taskDescription = ""
     @State private var estimatedMinutes: Int = 60
     @State private var dueDate: Date = Date()
 
-    
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 Color(.gray.opacity(0.2)).ignoresSafeArea()
-                ScrollView {
+                ScrollView(.vertical) {
                     VStack(alignment: .leading, spacing: 24) {
                         // Greeting
                         VStack(alignment: .leading, spacing: 4) {
@@ -43,31 +42,54 @@ struct HomeView: View {
                             GridItem(.flexible()),
                             GridItem(.flexible())
                         ], spacing: 16) {
-                            // Total Tasks
-                            DashboardStatCard(
-                                title: "Total Tasks",
-                                value: "\(viewModel.totalTasks)",
-                                icon: "checklist",
-                                color: Color(hex: "#7B61FF")
+                            NavigationLink(
+                                destination: TasksView(
+                                    title: "All Tasks",
+                                    showTimerButton: false,
+                                    viewModel: viewModel
+                                ),
+                                label: {
+                                    DashboardStatCard(
+                                        title: "Total Tasks",
+                                        value: "\(viewModel.totalTasks)",
+                                        icon: "checklist",
+                                        color: Color(hex: "#7B61FF")
+                                    )
+                                }
                             )
-                            
-                            // Completed This Week
-                            DashboardStatCard(
-                                title: "Completed",
-                                value: "\(viewModel.completedTasks)",
-                                icon: "checkmark.circle.fill",
-                                color: .green
+
+                            NavigationLink(
+                                destination: TasksView(
+                                    title: "Completed Tasks",
+                                    showTimerButton: false,
+                                    viewModel: viewModel
+                                ),
+                                label: {
+                                    DashboardStatCard(
+                                        title: "Completed",
+                                        value: "\(viewModel.completedTasks)",
+                                        icon: "checkmark.circle.fill",
+                                        color: .green
+                                    )
+                                }
                             )
-                            
-                            // Yet to Complete
-                            DashboardStatCard(
-                                title: "To Do",
-                                value: "\(viewModel.upcomingTasks)",
-                                icon: "clock.fill",
-                                color: .orange
+
+                            NavigationLink(
+                                destination: TasksView(
+                                    title: "To Do",
+                                    showTimerButton: true,
+                                    viewModel: viewModel
+                                ),
+                                label: {
+                                    DashboardStatCard(
+                                        title: "To Do",
+                                        value: "\(viewModel.upcomingTasks)",
+                                        icon: "clock.fill",
+                                        color: .orange
+                                    )
+                                }
                             )
-                            
-                            // Study Time
+
                             DashboardStatCard(
                                 title: "Study Time",
                                 value: "\(viewModel.totalStudyTime)m",
@@ -76,8 +98,8 @@ struct HomeView: View {
                             )
                         }
                         .padding(.horizontal)
-                        
-                        // Recent/Upcoming Tasks
+
+                        // Upcoming Tasks
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Upcoming Tasks")
                                 .font(.headline)
@@ -106,13 +128,9 @@ struct HomeView: View {
                         .cornerRadius(16)
                         .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
                         .padding(.horizontal)
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(16)
-                        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
-                        .padding(.horizontal)
-                        
+
                         Spacer()
+
                         // Add Task Button
                         HStack {
                             Spacer()
@@ -134,7 +152,6 @@ struct HomeView: View {
                         .padding(.bottom, 24)
                     }
                 }
-                .navigationTitle("")
                 .toolbar {
                     ToolbarItem(placement: .automatic) {
                         Button("Logout") {
@@ -153,7 +170,7 @@ struct HomeView: View {
                 Text("New Task")
                     .font(.headline)
                     .padding(.top, -40)
-                
+
                 TextField("Enter task description", text: $taskDescription)
                     .padding()
                     .background(Color(.systemGray6))
@@ -164,9 +181,9 @@ struct HomeView: View {
                     )
                     .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                     .padding(.horizontal)
-                
+
                 Spacer().frame(height: 15)
-                
+
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Estimated Time")
                         .font(.headline)
@@ -199,7 +216,7 @@ struct HomeView: View {
                 DatePicker("Due Date", selection: $dueDate, displayedComponents: [.date])
                     .datePickerStyle(.compact)
                     .padding(.horizontal)
-                
+
                 Spacer().frame(height: 12)
 
                 HStack {
@@ -232,18 +249,16 @@ struct HomeView: View {
             .padding()
             .presentationDetents([.height(500)])
         }
-
     }
 }
+
 
 struct DashboardStatCard: View {
     let title: String
     let value: String
     let icon: String
     let color: Color
-    
-    @GestureState private var isPressed = false
-    
+
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: icon)
@@ -261,16 +276,9 @@ struct DashboardStatCard: View {
         .background(Color.white)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
-        .scaleEffect(isPressed ? 0.97 : 1)
-        .animation(.easeInOut(duration: 0.1), value: isPressed)
-        .gesture(
-            LongPressGesture(minimumDuration: 0.01)
-                .updating($isPressed) { currentState, gestureState, _ in
-                    gestureState = currentState
-                }
-        )
     }
 }
+
 
 struct DashboardTask: Hashable {
     let title: String
