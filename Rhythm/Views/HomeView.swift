@@ -267,6 +267,7 @@ struct DashboardStatCard: View {
             Text(value)
                 .font(.title2)
                 .fontWeight(.bold)
+                .foregroundColor(.black)
             Text(title)
                 .font(.caption)
                 .foregroundColor(.gray)

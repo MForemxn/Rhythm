@@ -1,11 +1,3 @@
-//
-//  TasksView.swift
-//  Rhythm
-//
-//  Created by Chris Joju on 13/5/2025.
-//
-
-
 import SwiftUI
 
 struct TasksView: View {
@@ -14,28 +6,30 @@ struct TasksView: View {
     @ObservedObject var viewModel: HomeViewModel
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Text(title)
-                .font(.largeTitle)
-                .bold()
-                .padding()
-
-            if filteredTasks.isEmpty {
-                Text("No tasks to display.")
-                    .foregroundColor(.gray)
+        NavigationStack {
+            VStack(alignment: .leading) {
+                Text(title)
+                    .font(.largeTitle)
+                    .bold()
                     .padding()
-            } else {
-                List {
-                    ForEach(filteredTasks.indices, id: \.self) { index in
-                        let task = filteredTasks[index]
 
-                        Button(action: {
-                            toggleTaskCompletion(task)
-                        }) {
+                if filteredTasks.isEmpty {
+                    Text("No tasks to display.")
+                        .foregroundColor(.gray)
+                        .padding()
+                } else {
+                    List {
+                        ForEach(filteredTasks.indices, id: \.self) { index in
+                            let task = filteredTasks[index]
+
                             VStack(alignment: .leading, spacing: 4) {
                                 HStack {
-                                    Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
-                                        .foregroundColor(task.isCompleted ? .green : .gray)
+                                    Button(action: {
+                                        toggleTaskCompletion(task)
+                                    }) {
+                                        Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
+                                            .foregroundColor(task.isCompleted ? .green : .gray)
+                                    }
                                     Text(task.title)
                                         .fontWeight(.medium)
                                 }
@@ -61,15 +55,13 @@ struct TasksView: View {
                             }
                             .padding(.vertical, 4)
                         }
-                        .buttonStyle(PlainButtonStyle())
                     }
                 }
             }
+            .navigationTitle(title)
         }
-        .navigationTitle(title)
     }
 
-    // Filter tasks based on title
     private var filteredTasks: [TaskModel] {
         if title.contains("Completed") {
             return viewModel.tasks.filter { $0.isCompleted }
@@ -80,7 +72,6 @@ struct TasksView: View {
         }
     }
 
-    // Toggle completion and update model
     private func toggleTaskCompletion(_ task: TaskModel) {
         if let index = viewModel.tasks.firstIndex(where: { $0.id == task.id }) {
             viewModel.tasks[index].isCompleted.toggle()
@@ -89,12 +80,3 @@ struct TasksView: View {
         }
     }
 }
-
-//#Preview {
-//    TasksView(
-//        title: "Sample Tasks",
-//        showTimerButton: true,
-//        viewModel: HomeViewModel()
-//    )
-//}
-
